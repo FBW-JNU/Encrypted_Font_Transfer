@@ -1,0 +1,34 @@
+{
+  "experiment_name": "multi_user_attribution",
+  "user_ids": [
+    "user_00",
+    "user_01",
+    "user_02",
+    "user_03"
+  ],
+  "paths": {
+    "train": "data/train.pt",
+    "validation": "data/validation.pt",
+    "test": "data/test.pt",
+    "output": "outputs"
+  },
+  "model": {
+    "channels": [32, 64, 128],
+    "embedding_dim": 256,
+    "dropout": 0.1
+  },
+  "training": {
+    "steps": 1200,
+    "batch_size": 32,
+    "validation_interval": 100,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0001,
+    "gradient_clip_norm": 1.0,
+    "seed": 20261011,
+    "num_workers": 0
+  },
+  "decision": {
+    "maximum_validation_unknown_fpr": 0.01
+  }
+}
+
