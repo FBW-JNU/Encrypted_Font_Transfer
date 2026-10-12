@@ -37,6 +37,8 @@ python train.py
 
 Weights, keys, generated images, and logs are written only to ignored local directories. Weights & Biases is disabled by default. To enable it, authenticate outside the repository and set `WANDB_MODE=online`; never store an API key in source code.
 
+The model trained using this code is available as `model.pth` in [Releases](https://github.com/FBW-JNU/Encrypted_Font_Transfer/releases).
+
 ## BER and decision thresholds
 
 For a target bit vector `b` and a binarized extracted vector `b_hat`, both of length `L`, the bit error rate is:
