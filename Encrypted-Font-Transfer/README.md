@@ -1,4 +1,4 @@
-# Encrypted Font Transfer
+# Encrypted_Font_Transfer
 
 Encrypted Font Transfer extends Handwriting Transformers with key-conditioned watermark embedding, extraction, robustness evaluation, and multi-user attribution experiments.
 
@@ -37,15 +37,8 @@ python train.py
 
 Weights, keys, generated images, and logs are written only to ignored local directories. Weights & Biases is disabled by default. To enable it, authenticate outside the repository and set `WANDB_MODE=online`; never store an API key in source code.
 
-## BER and decision thresholds
+The model trained using this code is available as `model.pth` in [Releases](https://github.com/FBW-JNU/Encrypted_Font_Transfer/releases).
 
-For a target bit vector `b` and a binarized extracted vector `b_hat`, both of length `L`, the bit error rate is:
-
-```text
-BER = number_of_mismatched_bits / L
-```
-
-Extractor probabilities are converted to bits at `0.5`. This bit-binarization threshold is different from the sample-level acceptance threshold: a sample is accepted only when its BER or calibrated presence score passes the rule selected on the validation split. Test data is never used to choose that rule.
 
 ## Multi-user experiments
 
