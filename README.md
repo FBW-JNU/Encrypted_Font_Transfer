@@ -9,11 +9,16 @@ This public source package intentionally excludes datasets, model weights, user 
 ```text
 .
 ├── data/                         # Dataset loaders and preparation tools
+├── demo.py                       # One-image generation and extraction example
+├── evaluation/                   # Key, robustness, and new-attack evaluation
 ├── models/                       # Generator, extractor, OCR, and noise modules
 ├── multi_user_experiments/
 │   └── multi_user_attribution_experiment/
+├── pretrained_models/
+│   └── multi_user_attribution/    # Ten ready-to-load detector weights
 └── train.py                      # Main encrypted font-transfer training entry point
 ```
+
 
 The included multi-user attribution experiment trains one joint open-set model over all registered users and rejects unknown inputs using a validation-calibrated presence threshold.
 
@@ -52,6 +57,19 @@ python main.py train --config config.json
 Private user keys, registered templates, base checkpoints, and datasets must remain local. 
 
 Checkpoints for the ten independently protected model instances are available in the [multi-user release](https://github.com/FBW-JNU/Encrypted_Font_Transfer/releases#release-multi_user). Each checkpoint corresponds to a separately trained model associated with a different user identity. These checkpoints support evaluation of watermark extraction and closed-set source attribution across the ten registered identities.
+
+
+## Minimal demo
+
+With a trained main-model checkpoint, its matching 512-bit registered key, the test-set pickle, and the word list available locally, run:
+
+```bash
+python demo.py --checkpoint saved_models/your-experiment/model.pth \
+  --key saved_models/your-experiment/key.pt \
+  --dataset files/IAM-32.pickle --english-words files/english_words.txt
+```
+
+The demo picks one reproducible test sample, generates `outputs/demo/generated.png`, extracts the checkpoint's 128-bit identity code from the saved image, and prints its BER. Use `--output`, `--seed`, and `--device` to change those defaults. The checkpoint, key, and dataset must belong to a compatible experiment; this source package does not include a main-model checkpoint or private registered key. Keep those assets and generated samples out of Git. This is a functional illustration, not a substitute for the full evaluation scripts. See [DEMO.md](DEMO.md) for complete usage and interpretation notes.
 
 
 ## License
