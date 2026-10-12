@@ -51,6 +51,8 @@ python main.py train --config config.json
 
 Private user keys, registered templates, base checkpoints, and datasets must remain local. 
 
+Checkpoints for the ten independently protected model instances are available in the [multi-user release](https://github.com/FBW-JNU/Encrypted_Font_Transfer/releases#release-multi_user). Each checkpoint corresponds to a separately trained model associated with a different user identity. These checkpoints support evaluation of watermark extraction and closed-set source attribution across the ten registered identities.
+
 
 ## License
 
