@@ -1,0 +1,33 @@
+{
+  "checkpoint": "../saved_models/your-experiment/model.pth",
+  "dataset": "../files/IAM-32.pickle",
+  "english_words": "../files/english_words.txt",
+  "key": "../saved_models/your-experiment/key.pt",
+  "output": "../outputs/key_control",
+  "sample_manifest": "../outputs/shared_samples.json",
+  "device": "cuda",
+  "batch_size": 8,
+  "sample_count": 1000,
+  "seed": 20261012,
+  "methods": ["Ours", "StegaStamp", "RiHoop", "InstanceWmk", "SepMark", "QuatMom", "MultiHist"],
+  "external_methods": {},
+  "attacks": {
+    "awgn": [0.1, 0.5, 0.7],
+    "salt_pepper": [0.1, 0.2, 0.3],
+    "gaussian_blur": [0.5, 1.0, 2.0],
+    "motion_blur": [1, 5, 9],
+    "jpeg": [75, 50, 25],
+    "rotation": [5, 15, 25, 35, 50, 75, 180],
+    "warping": [0.2, 0.3, 0.4],
+    "resize": [0.98, 0.95, 0.90]
+  },
+  "attack_settings": {
+    "gaussian_kernel": 7,
+    "motion_angle": 25
+  },
+  "hopskipjump": {
+    "max_queries": 156,
+    "max_iter": 10
+  },
+  "training_attacks": null
+}

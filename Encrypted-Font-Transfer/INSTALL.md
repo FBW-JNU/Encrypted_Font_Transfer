@@ -15,7 +15,7 @@ Install a PyTorch build compatible with your CUDA driver if the default package 
 
 ## Data
 
-The original IAM/CVL data and pretrained weights are not redistributed here. Keep local assets in the following ignored structure:
+The original IAM/CVL data and main generator weights are not redistributed here. The pretrained ten-user attribution detectors are included under `pretrained_models/multi_user_attribution/`. Keep other local assets in the following ignored structure:
 
 ```text
 files/
@@ -39,7 +39,11 @@ The dataset pickle format expected by the original loader is:
 }
 ```
 
-Do not commit datasets, checkpoints, generated keys, logs, or evaluation results. The repository `.gitignore` excludes them by default.
+Training locates `files/`, `saved_models/`, and `saved_images/` relative to the repository, not the shell's current directory. Evaluation paths are relative to the evaluation config file; multi-user experiment paths are relative to its config file. Absolute paths are also accepted in configs when assets are stored elsewhere.
+
+The legacy IAM preparation helper takes explicit `--iam-root`, `--train-index`, and `--test-index` paths; optional `--word-images` and `--xmls` override locations under the IAM root. It recreates output directories, so review its output path before running it on valuable data. `data/create_data.py` only lists CVL word-image paths given `--cvl-root`; it does not create a training pickle.
+
+Do not commit datasets, training checkpoints, generated keys, logs, or evaluation results. The repository `.gitignore` excludes them by default and allows only the ten published detector state dictionaries.
 
 ## Optional experiment tracking
 

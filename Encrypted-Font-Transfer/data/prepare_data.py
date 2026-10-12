@@ -20,6 +20,7 @@ import math
 from tqdm import tqdm
 from itertools import compress
 import glob
+from pathlib import Path
 def checkImageIsValid(imageBin):
     if imageBin is None:
         return False
@@ -210,11 +211,6 @@ def createDataset(IMG_DATA, image_path_list, label_list, outputPath, mode, autho
                  + '_NoDiscard_wide' * (not discard_wide) + '_NoDiscard_wide' * (not discard_narr))+'_unlabeld' * (not labeled) +\
                  (('IAM' in outputPath) and remove_punc) *'_removePunc'
 
-    outputPath_ = '/root/Handwritten_data/IAM/authors' + (resize=='charResize') * ('/h%schar%sto%s/'%(imgH, charminW, charmaxW)) + (resize=='keepRatio') * ('/h%s/'%(imgH)) \
-                 + (resize=='noResize') * ('/noResize/') + (author_id!='None') * ('single_authors/'+author_id+'/' ) \
-                 + mode + (resize!='noResize') * (('_initGap%s'%(init_gap)) * (init_gap>0) + ('_hGap%s'%(h_gap)) * (h_gap>0) \
-                 + '_NoDiscard_wide' * (not discard_wide) + '_NoDiscard_wide' * (not discard_narr))+'_unlabeld' * (not labeled) +\
-                 (('IAM' in outputPath) and remove_punc) *'_removePunc'
     print(outputPath)
     if os.path.exists(outputPath):
         shutil.rmtree(outputPath)
@@ -362,10 +358,18 @@ def printAlphabet(label_list):
 
 if __name__ == '__main__':
 
-    TRAIN_IDX = 'gan.iam.tr_va.gt.filter27'
-    TEST_IDX =  'gan.iam.test.gt.filter27'
-    IAM_WORD_DATASET_PATH = '../../data/IAM/nfs/users/ext_ankan.bhunia/data/Handwritten_data/IAM/wordImages/'
-    XMLS_PATH = '../../data/IAM/nfs/users/ext_ankan.bhunia/data/Handwritten_data/IAM/xmls/'
+    parser = argparse.ArgumentParser(description='Prepare IAM data from user-supplied paths')
+    parser.add_argument('--iam-root', type=Path, required=True, help='Directory containing the IAM data')
+    parser.add_argument('--train-index', type=Path, required=True)
+    parser.add_argument('--test-index', type=Path, required=True)
+    parser.add_argument('--word-images', type=Path, help='Defaults to IAM_ROOT/wordImages')
+    parser.add_argument('--xmls', type=Path, help='Defaults to IAM_ROOT/xmls')
+    args = parser.parse_args()
+    iam_root = args.iam_root.expanduser().resolve()
+    TRAIN_IDX = args.train_index.expanduser().resolve()
+    TEST_IDX = args.test_index.expanduser().resolve()
+    IAM_WORD_DATASET_PATH = str((args.word_images or iam_root / 'wordImages').expanduser().resolve()) + '/'
+    XMLS_PATH = str((args.xmls or iam_root / 'xmls').expanduser().resolve()) + '/'
     word_paths = {i.split('/')[-1][:-4]:i for i in glob.glob(IAM_WORD_DATASET_PATH + '*/*/*.png')}
     id_to_wid = {i.split('/')[-1][:-4]:xmltodict.parse(open(i).read())['form']['@writer-id'] for i in glob.glob(XMLS_PATH+'/**')}
     trainslist = [i[:-1] for i in open(TRAIN_IDX, 'r').readlines()]
@@ -402,7 +406,7 @@ if __name__ == '__main__':
     dataset = 'IAM'     #CVL/IAM/RIMES/gw
     mode = 'all'        # tr/te/val/va1/va2/all
     labeled = True
-    top_dir = '../../data/IAM/nfs/users/ext_ankan.bhunia/data/Handwritten_data/'
+    top_dir = str(iam_root.parent)
     # parameter relevant for IAM/RIMES:
     words = True        # use words images, otherwise use lines
     #parameters relevant for IAM:

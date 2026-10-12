@@ -1,18 +1,21 @@
-import random
-import torch
-from torch.utils.data import Dataset
-from torch.utils.data import sampler
-import lmdb
-import torchvision.transforms as transforms
-import six
-import sys
-from PIL import Image
-import numpy as np
-import os
-import sys
-import pickle
-import numpy as np
+"""List CVL word images under a user-supplied dataset root."""
 
-import glob
+import argparse
+from pathlib import Path
 
-glob.glob('/nfs/users/ext_ankan.bhunia/Handwritten_data/CVL/cvl-database-1-1/*/words/*/*tif')
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--cvl-root", type=Path, required=True,
+                        help="Directory containing cvl-database-1-1")
+    args = parser.parse_args()
+    root = args.cvl_root.expanduser().resolve()
+    images = sorted((root / "cvl-database-1-1").glob("*/words/*/*tif"))
+    if not images:
+        parser.error(f"no CVL word images found under {root}")
+    for image in images:
+        print(image)
+
+
+if __name__ == "__main__":
+    main()

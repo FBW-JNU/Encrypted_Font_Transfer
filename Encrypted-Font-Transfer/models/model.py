@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 import shutil
 from math import ceil
 import hashlib
+from pathlib import Path
 from models.noise_layer import Noiser
 
 
@@ -183,7 +184,7 @@ class FCNDecoder(nn.Module):
 
 class Generator(nn.Module):
 
-    def __init__(self):
+    def __init__(self, load_pretrained=True):
         super(Generator, self).__init__()
 
         INP_CHANNEL = NUM_EXAMPLES
@@ -201,7 +202,7 @@ class Generator(nn.Module):
         self.decoder = TransformerDecoder(decoder_layer, TN_DEC_LAYERS, decoder_norm,
                                           return_intermediate=True)
 
-        self.Feat_Encoder = nn.Sequential(*([nn.Conv2d(INP_CHANNEL, 64, kernel_size=7, stride=2, padding=3, bias=False)] +list(models.resnet18(pretrained=True).children())[1:-2]))
+        self.Feat_Encoder = nn.Sequential(*([nn.Conv2d(INP_CHANNEL, 64, kernel_size=7, stride=2, padding=3, bias=False)] +list(models.resnet18(pretrained=load_pretrained).children())[1:-2]))
         
         self.query_embed = nn.Embedding(VOCAB_SIZE, TN_HIDDEN_DIM)
 
@@ -420,13 +421,13 @@ class HashNet(nn.Module):
 
 
 class Extractor(nn.Module):
-    def __init__(self):
+    def __init__(self, load_pretrained=True):
         super().__init__()
         encoder_layer = TransformerEncoderLayer(TN_HIDDEN_DIM, TN_NHEADS, TN_DIM_FEEDFORWARD,
                                                 TN_DROPOUT, "relu", True)
         encoder_norm = nn.LayerNorm(TN_HIDDEN_DIM) if True else None
         self.encoder = TransformerEncoder(encoder_layer, TN_EXT_LAYERS, encoder_norm)
-        self.Feat_Encoder = nn.Sequential(*([nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)] +list(models.resnet18(pretrained=True).children())[1:-2]))
+        self.Feat_Encoder = nn.Sequential(*([nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)] +list(models.resnet18(pretrained=load_pretrained).children())[1:-2]))
         self.DEC = FCNDecoder(ups=3, res_norm='in')
         self.fc = nn.Linear(TN_HIDDEN_DIM, 128)
         self.sig = nn.Sigmoid()
@@ -456,16 +457,16 @@ class Extractor(nn.Module):
 
 class TRGAN(nn.Module):
 
-    def __init__(self):
+    def __init__(self, load_pretrained=True):
         super(TRGAN, self).__init__()
 
         self.epsilon = 1e-7
-        self.netG = Generator().to(DEVICE)
+        self.netG = Generator(load_pretrained=load_pretrained).to(DEVICE)
         self.netD = safe_data_parallel(Discriminator()).to(DEVICE)
         self.netW = safe_data_parallel(WDiscriminator()).to(DEVICE)
         self.netconverter = strLabelConverter(ALPHABET)
         self.netOCR = CRNN().to(DEVICE)
-        self.netExt = Extractor().to(DEVICE)
+        self.netExt = Extractor(load_pretrained=load_pretrained).to(DEVICE)
         self.OCR_criterion = CTCLoss(zero_infinity=True, reduction='none')
         self.l2loss = nn.MSELoss()
         self.l1loss = nn.L1Loss()
@@ -474,7 +475,7 @@ class TRGAN(nn.Module):
 
 
         block_idx = InceptionV3.BLOCK_INDEX_BY_DIM[2048]
-        self.inception = InceptionV3([block_idx]).to(DEVICE)
+        self.inception = InceptionV3([block_idx], load_pretrained=load_pretrained).to(DEVICE)
 
       
         self.optimizer_G = torch.optim.Adam(self.netG.parameters(),
@@ -528,16 +529,15 @@ class TRGAN(nn.Module):
                 lex.append(word)
         self.lex = lex
 
-        f = open('mytext.txt', 'r') 
-
-        self.text = [j.encode() for j in sum([i.split(' ') for i in f.readlines()], [])]#[:NUM_EXAMPLES]
+        with (Path(__file__).resolve().parents[1] / 'mytext.txt').open('r', encoding='utf-8') as f:
+            self.text = [j.encode() for j in sum([i.split(' ') for i in f.readlines()], [])]#[:NUM_EXAMPLES]
         self.eval_text_encode, self.eval_len_text = self.netconverter.encode(self.text)
         self.eval_text_encode = self.eval_text_encode.to(DEVICE).repeat(batch_size, 1, 1)
 
     def save_images_for_fid_calculation(self, dataloader, epoch, mode = 'train'):
 
-        self.real_base = os.path.join('saved_images', EXP_NAME, 'Real')
-        self.fake_base = os.path.join('saved_images', EXP_NAME, 'Fake')
+        self.real_base = str(SAVED_IMAGES_DIR / EXP_NAME / 'Real')
+        self.fake_base = str(SAVED_IMAGES_DIR / EXP_NAME / 'Fake')
 
         if os.path.isdir(self.real_base): shutil.rmtree(self.real_base)
         if os.path.isdir(self.fake_base): shutil.rmtree(self.fake_base)
@@ -1336,9 +1336,6 @@ class TRGAN(nn.Module):
                     net.cuda(self.gpu_ids[0])
                 else:
                     torch.save(net.cpu().state_dict(), save_path)
-
-
-
 
 
 

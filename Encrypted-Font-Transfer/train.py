@@ -37,7 +37,7 @@ def main():
     validation_loader = make_loader(TextDatasetval(num_examples=NUM_EXAMPLES))
 
     model = TRGAN()
-    model_path = Path("saved_models") / EXP_NAME
+    model_path = SAVED_MODELS_DIR / EXP_NAME
     user_key = load_or_create_key(model_path, resume=RESUME)
     checkpoint_path = model_path / "model.pth"
     if RESUME:

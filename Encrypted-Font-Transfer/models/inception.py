@@ -38,7 +38,8 @@ class InceptionV3(nn.Module):
                  resize_input=True,
                  normalize_input=True,
                  requires_grad=False,
-                 use_fid_inception=True):
+                 use_fid_inception=True,
+                 load_pretrained=True):
         """Build pretrained InceptionV3
         Parameters
         ----------
@@ -81,9 +82,9 @@ class InceptionV3(nn.Module):
         self.blocks = nn.ModuleList()
 
         if use_fid_inception:
-            inception = fid_inception_v3()
+            inception = fid_inception_v3(load_pretrained=load_pretrained)
         else:
-            inception = models.inception_v3(pretrained=True)
+            inception = models.inception_v3(pretrained=load_pretrained)
 
         # Block 0: input to maxpool1
         block0 = [
@@ -218,7 +219,7 @@ def calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
             np.trace(sigma2) - 2 * tr_covmean)
 
 
-def fid_inception_v3():
+def fid_inception_v3(load_pretrained=True):
     """Build pretrained Inception model for FID computation
     The Inception model for FID computation uses a different set of weights
     and has a slightly different structure than torchvision's Inception.
@@ -238,8 +239,9 @@ def fid_inception_v3():
     inception.Mixed_7b = FIDInceptionE_1(1280)
     inception.Mixed_7c = FIDInceptionE_2(2048)
 
-    state_dict = load_state_dict_from_url(FID_WEIGHTS_URL, progress=True)
-    inception.load_state_dict(state_dict)
+    if load_pretrained:
+        state_dict = load_state_dict_from_url(FID_WEIGHTS_URL, progress=True)
+        inception.load_state_dict(state_dict)
     return inception
 
 

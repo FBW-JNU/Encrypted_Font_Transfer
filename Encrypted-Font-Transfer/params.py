@@ -4,6 +4,11 @@ from pathlib import Path
 
 import torch
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+FILES_DIR = PROJECT_ROOT / "files"
+SAVED_MODELS_DIR = PROJECT_ROOT / "saved_models"
+SAVED_IMAGES_DIR = PROJECT_ROOT / "saved_images"
+
 ###############################################
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 RESUME = False
@@ -16,12 +21,12 @@ else:
 
 
 if DATASET == 'IAM':
-    DATASET_PATHS = 'files/IAM-32.pickle'
+    DATASET_PATHS = FILES_DIR / 'IAM-32.pickle'
     NUM_WRITERS = 339
 if DATASET == 'CVL':
-    DATASET_PATHS = 'files/CVL-32.pickle'
+    DATASET_PATHS = FILES_DIR / 'CVL-32.pickle'
     NUM_WRITERS = 283
-ENGLISH_WORDS_PATH = 'files/english_words.txt'
+ENGLISH_WORDS_PATH = FILES_DIR / 'english_words.txt'
 
 # Optional image-secret datasets. Binary-key experiments do not use these.
 SECRET_PATH = os.environ.get("EFT_SECRET_PATH", "")
@@ -92,6 +97,6 @@ def load_or_create_key(model_path, resume=False):
 
 def init_project():
     """Create runtime image directories without deleting existing output."""
-    root = Path("saved_images") / EXP_NAME
+    root = SAVED_IMAGES_DIR / EXP_NAME
     (root / "Real").mkdir(parents=True, exist_ok=True)
     (root / "Fake").mkdir(parents=True, exist_ok=True)
