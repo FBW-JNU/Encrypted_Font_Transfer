@@ -39,15 +39,6 @@ Weights, keys, generated images, and logs are written only to ignored local dire
 
 The model trained using this code is available as `model.pth` in [Releases](https://github.com/FBW-JNU/Encrypted_Font_Transfer/releases).
 
-## BER and decision thresholds
-
-For a target bit vector `b` and a binarized extracted vector `b_hat`, both of length `L`, the bit error rate is:
-
-```text
-BER = number_of_mismatched_bits / L
-```
-
-Extractor probabilities are converted to bits at `0.5`. This bit-binarization threshold is different from the sample-level acceptance threshold: a sample is accepted only when its BER or calibrated presence score passes the rule selected on the validation split. Test data is never used to choose that rule.
 
 ## Multi-user experiments
 
