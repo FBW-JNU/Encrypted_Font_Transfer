@@ -20,7 +20,14 @@ This public source package intentionally excludes datasets, model weights, user 
 ```
 
 
-The included multi-user attribution experiment trains one joint open-set model over all registered users and rejects unknown inputs using a validation-calibrated presence threshold.
+The attribution code trains one CNN detector per registered user.
+The detectors have separate parameters and are optimized jointly
+using pre-generated images and their source labels. The number
+of registered users is specified in the configuration.
+
+Closed-set attribution selects the user with the highest sigmoid
+score without a rejection threshold. The code also supports
+open-set evaluation with a validation-calibrated rejection threshold.
 
 ## Installation
 
