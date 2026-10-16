@@ -20,15 +20,6 @@ This public source package intentionally excludes datasets, model weights, user 
 ```
 
 
-The attribution code trains one CNN detector per registered user.
-The detectors have separate parameters and are optimized jointly
-using pre-generated images and their source labels. The number
-of registered users is specified in the configuration.
-
-Closed-set attribution selects the user with the highest sigmoid
-score without a rejection threshold. The code also supports
-open-set evaluation with a validation-calibrated rejection threshold.
-
 ## Installation
 
 Python 3.10 or newer is recommended. Create an isolated environment and run:
@@ -60,6 +51,8 @@ cd multi_user_experiments/multi_user_attribution_experiment
 cp config.example.json config.json
 python main.py train --config config.json
 ```
+
+The attribution code trains one CNN detector per registered user. The detectors have separate parameters and are optimized jointly using pre-generated images and their source labels. The number of registered users is specified in the configuration. Closed-set attribution selects the user with the highest sigmoid score without a rejection threshold. 
 
 Private user keys, registered templates, base checkpoints, and datasets must remain local. 
 
